@@ -15,12 +15,12 @@ public class MyServer {
             while (true) {
                 Socket socket = serverSocket.accept();
                 if (socket != null) {
-                    BufferedReader clientReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-                    String clientMessage = clientReader.readLine();
-                    System.out.println(clientMessage);
+                    ObjectInputStream clientReader = new ObjectInputStream(socket.getInputStream());
+                    Client user1 = (Client) clientReader.readObject();
+                    System.out.println(user1);
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
