@@ -24,17 +24,20 @@ public class ClientEntity implements Runnable, Observer {
         BufferedReader clientReader = new BufferedReader(new InputStreamReader(
                 socket.getInputStream()));
         while (true) {
+
             String clientMessage = clientReader.readLine();
-            if (clientMessage.startsWith("REGISTRATION")) {
-                String[] logPass = clientMessage.substring(12).split(":");
-                client = new Client(logPass[0], logPass[1].toCharArray());
-                System.out.println("New client connected: " +
-                        logPass[0] + " " + logPass[1]);
-                server.addObserver(this);
-                server.notifyObservers(client.getUserName() + ": " + clientMessage);
-            } else {
-                System.out.println(clientMessage);
-                server.notifyObservers(client.getUserName() + ": " + clientMessage);
+            if(clientMessage!=null) {
+                if (clientMessage.startsWith("REGISTRATION")) {
+                    String[] logPass = clientMessage.substring(12).split(":");
+                    client = new Client(logPass[0], logPass[1].toCharArray());
+                    System.out.println("New client connected: " +
+                            logPass[0] + " " + logPass[1]);
+                    server.addObserver(this);
+                    server.notifyObservers(client.getUserName() + ": " + clientMessage);
+                } else {
+                    System.out.println(clientMessage);
+                    server.notifyObservers(client.getUserName() + ": " + clientMessage);
+                }
             }
         }
     }
