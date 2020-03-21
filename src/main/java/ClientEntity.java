@@ -25,6 +25,7 @@ public class ClientEntity implements Runnable, Observer {
         BufferedReader clientReader = new BufferedReader(new InputStreamReader(
                 socket.getInputStream()));
         while ((clientMessage = clientReader.readLine()) != null) {
+
             if (clientMessage.startsWith("REGISTRATION")) {
                 String[] logPass = clientMessage.substring(12).split(":");
                 client = new Client(logPass[0], logPass[1].toCharArray());
@@ -33,6 +34,11 @@ public class ClientEntity implements Runnable, Observer {
                 server.addObserver(this);
                 server.notifyObservers(client.getUserName() + ": " + clientMessage);
             } else {
+                if (clientMessage.equalsIgnoreCase("Exit")) {
+                    server.notifyObservers(client.getUserName() + " stop session!");
+                    server.stopObserver(this);
+                    break;
+                }
                 System.out.println("Client "+ client.getUserName()+":  "+ clientMessage);
                 server.notifyObservers(client.getUserName() + ": " + clientMessage);
             }

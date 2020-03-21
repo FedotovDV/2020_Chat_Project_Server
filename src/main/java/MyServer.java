@@ -14,9 +14,8 @@ public class MyServer  implements Observable{
 
     public void start() {
         Socket socket = null;
-        ServerSocket serverSocket = null;
-        try {
-            serverSocket = new ServerSocket(PORT);
+
+        try (ServerSocket serverSocket = new ServerSocket(PORT)){
             System.out.println("==START SERVER==");
             while (true) {
                 if (socket == null) {
@@ -29,15 +28,6 @@ public class MyServer  implements Observable{
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try{
-                assert socket != null;
-                socket.close();
-                System.out.println("==STOP SERVER==");
-                serverSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
