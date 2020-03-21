@@ -33,7 +33,7 @@ public class ClientEntity implements Runnable, Observer {
                 server.addObserver(this);
                 server.notifyObservers(client.getUserName() + ": " + clientMessage);
             } else {
-                System.out.println(clientMessage);
+                System.out.println("Client "+ client.getUserName()+":  "+ clientMessage);
                 server.notifyObservers(client.getUserName() + ": " + clientMessage);
             }
         }
@@ -49,7 +49,4 @@ public class ClientEntity implements Runnable, Observer {
 
     }
 
-//    public boolean registration(){
-//
-//    }
 }
