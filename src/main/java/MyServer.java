@@ -13,10 +13,11 @@ public class MyServer  implements Observable{
     private volatile  List<Observer> clients = new ArrayList<>();
 
     public void start() {
-        System.out.println("==START SERVER==");
+        Socket socket = null;
+        ServerSocket serverSocket = null;
         try {
-            ServerSocket serverSocket = new ServerSocket(PORT);
-            Socket socket = null;
+            serverSocket = new ServerSocket(PORT);
+            System.out.println("==START SERVER==");
             while (true) {
                 if (socket == null) {
                     socket = serverSocket.accept();
@@ -28,6 +29,15 @@ public class MyServer  implements Observable{
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try{
+                assert socket != null;
+                socket.close();
+                System.out.println("==STOP SERVER==");
+                serverSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -38,7 +48,7 @@ public class MyServer  implements Observable{
 
     @Override
     public void stopObserver(Observer o) {
-        /**/
+       clients.remove(o);
     }
 
     @Override
