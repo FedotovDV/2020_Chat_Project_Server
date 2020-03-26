@@ -1,5 +1,6 @@
 
-import com.google.gson.Gson;
+import interfaces.Observable;
+import interfaces.Observer;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -7,7 +8,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MyServer  implements Observable{
+public class MyServer  implements Observable {
 
     public final static int PORT = 8290;
     private volatile  List<Observer> clients = new ArrayList<>();

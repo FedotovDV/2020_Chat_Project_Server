@@ -1,11 +1,8 @@
 import com.google.gson.Gson;
+import interfaces.Observer;
 import lombok.SneakyThrows;
-import com.google.gson.Gson;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.*;
 import java.net.Socket;
 
 
@@ -28,27 +25,20 @@ public class ClientEntity implements Runnable, Observer {
         BufferedReader clientReader = new BufferedReader(new InputStreamReader(
                 socket.getInputStream()));
         while ((clientMessage = clientReader.readLine()) != null) {
-            if (clientMessage.startsWith("#$#pass#")) {
-                String[] logPass = clientMessage.split("/");
+            if (clientMessage.startsWith("{")) {
                 Gson gson = new Gson();
-                client = gson.fromJson(logPass[1], Client.class);
-                client.setUserPassword(logPass[2]);
-                System.out.println(client.toString());
-//            System.out.println(client.toString());
-//
-//            if (clientMessage.startsWith("REGISTRATION")) {
-//                String[] logPass = clientMessage.substring(12).split(":");
-//                client = new Client(logPass[0], logPass[1].toCharArray());
-//                System.out.println("New client connected: " +
-//                        logPass[0] + " " + logPass[1]);
+                client = gson.fromJson(clientMessage, Client.class);
                 server.addObserver(this);
                 server.notifyObservers(client.getUserName() + ": " + clientMessage);
             } else {
                 if (clientMessage.equalsIgnoreCase("Exit")) {
+                    this.SendMessage("Exit");
                     server.notifyObservers(client.getUserName() + " stop session!");
                     server.stopObserver(this);
+                    System.out.println("Client " + client.getUserName() + ":  " + " stop session!");
                     break;
                 }
+
                 System.out.println("Client " + client.getUserName() + ":  " + clientMessage);
                 server.notifyObservers(client.getUserName() + ": " + clientMessage);
             }
@@ -63,6 +53,13 @@ public class ClientEntity implements Runnable, Observer {
         writer.newLine();
         writer.flush();
 
+    }
+    @SneakyThrows
+    private void SendMessage(String message) {
+        BufferedWriter writer = new BufferedWriter(new PrintWriter(socket.getOutputStream()));
+        writer.write(message);
+        writer.newLine();
+        writer.flush();
     }
 
 }
