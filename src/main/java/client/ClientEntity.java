@@ -4,14 +4,19 @@ import com.google.gson.Gson;
 import interfaces.Observer;
 import lombok.SneakyThrows;
 import server.MyServer;
+import utility.DataSource;
+import utility.JDBCUtils;
 
 import java.io.*;
 import java.net.Socket;
+import java.sql.Connection;
+
+import static utility.JDBCUtils.*;
 
 
 public class ClientEntity implements Runnable, Observer {
 
-    private MyClient client;
+    private Client client;
     private Socket socket;
     private MyServer server;
     private static int clients_count = 0;
@@ -40,8 +45,27 @@ public class ClientEntity implements Runnable, Observer {
         while ((clientMessage = clientReader.readLine()) != null) {
             if (clientMessage.startsWith("{")) {
                 Gson gson = new Gson();
-                client = gson.fromJson(clientMessage, MyClient.class);
-                server.addObserver(this);
+                client = gson.fromJson(clientMessage, Client.class);
+                System.out.println("client = " + client);
+                try (Connection c = DataSource.getConnection()) {
+                    Client myClient = selectClientFromDB(c, client.getUserName());
+                    if (myClient != null) {
+                        if (myClient.getUserName().equals(client.getUserName())) {
+                            if (myClient.getHashPass().equals(client.getHashPass())) {
+                                System.out.println(client + " есть в базе");
+                            } else {
+                                System.out.println(" неправильная пара логин - пароль! ");
+                            }
+                        }
+                        }else {
+                        System.out.println(" добавляем нового клиента ");
+                        server.addObserver(this);
+                            int id = insertClientIntoDB(c, client.getUserName(), client.getHashPass());
+                        System.out.println("client = " + client);
+                            System.out.println(id);
+                    }
+
+                }
                 server.notifyObservers(client.getUserName() + ": " + clientMessage);
             } else {
                 if (clientMessage.equalsIgnoreCase("Exit")) {

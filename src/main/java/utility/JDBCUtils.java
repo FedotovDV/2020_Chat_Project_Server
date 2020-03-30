@@ -1,8 +1,42 @@
 package utility;
 
+import client.Client;
+
 import java.sql.*;
 
 public class JDBCUtils {
+
+    public static Integer insertClientIntoDB(Connection c, String name, String hashPass) throws SQLException {
+        return JDBCUtils.insert(c, "INSERT INTO users (NAME,PASSWORD) values (?, ?);",new ResultSetHandler<Integer>(){
+            @Override
+            public Integer handle(ResultSet rs) throws SQLException {
+                int inserted = -1;
+                if(rs.next()) {
+                    inserted = rs.getInt(1);
+                }
+                return inserted;
+            }
+        }, name, hashPass);
+    }
+
+    public static Client selectClientFromDB(Connection c, String name) throws SQLException {
+        return JDBCUtils.select(c, "select * from users where NAME = ?; ",
+                new ResultSetHandler<Client>() {
+                    @Override
+                    public Client handle(ResultSet rs) throws SQLException {
+                        if (rs.next()) {
+                            Client client = new Client();
+                            client.setUserName(rs.getString(2));
+                            client.setHashPass(rs.getString(4));
+                            return client;
+                        } else
+                            return null;
+                    }
+                }, name);
+    }
+
+
+
     public static <T> T select(Connection c, String sql, ResultSetHandler<T> resultSetHandler, Object... parameters)
             throws SQLException {
         try (PreparedStatement ps = c.prepareStatement(sql)) {

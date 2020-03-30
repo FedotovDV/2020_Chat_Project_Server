@@ -10,13 +10,13 @@ import java.io.Serializable;
 @Setter
 @EqualsAndHashCode
 @ToString
-public class MyClient implements Serializable {
+public class Client implements Serializable {
 
     private String userName;
     private transient char[] password;
     private String hashPass;
     private String userEmail;
 
-    public MyClient() {
+    public Client() {
     }
 }
