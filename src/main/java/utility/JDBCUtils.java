@@ -30,7 +30,7 @@ public class JDBCUtils {
     private static void populatePreparedStatement(PreparedStatement ps, Object... parameters) throws SQLException {
         if (parameters != null) {
             for (int i = 0; i < parameters.length; i++) {
-                ps.setObject(i + 1, parameters[i]);
+                ps.setObject(i+1, parameters[i]);
             }
         }
     }

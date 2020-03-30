@@ -1,4 +1,6 @@
+package server;
 
+import client.ClientEntity;
 import interfaces.Observable;
 import interfaces.Observer;
 
@@ -12,6 +14,7 @@ public class MyServer  implements Observable {
 
     public final static int PORT = 8290;
     private volatile  List<Observer> clients = new ArrayList<>();
+
 
     public void start() {
         Socket socket = null;

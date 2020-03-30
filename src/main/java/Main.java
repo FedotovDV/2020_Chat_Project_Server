@@ -1,4 +1,4 @@
-import java.sql.*;
+import server.MyServer;
 
 public class Main {
 

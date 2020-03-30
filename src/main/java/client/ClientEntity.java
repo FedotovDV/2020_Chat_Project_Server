@@ -1,15 +1,17 @@
+package client;
+
 import com.google.gson.Gson;
 import interfaces.Observer;
 import lombok.SneakyThrows;
+import server.MyServer;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.Scanner;
 
 
 public class ClientEntity implements Runnable, Observer {
 
-    private Client client;
+    private MyClient client;
     private Socket socket;
     private MyServer server;
     private static int clients_count = 0;
@@ -38,7 +40,7 @@ public class ClientEntity implements Runnable, Observer {
         while ((clientMessage = clientReader.readLine()) != null) {
             if (clientMessage.startsWith("{")) {
                 Gson gson = new Gson();
-                client = gson.fromJson(clientMessage, Client.class);
+                client = gson.fromJson(clientMessage, MyClient.class);
                 server.addObserver(this);
                 server.notifyObservers(client.getUserName() + ": " + clientMessage);
             } else {
