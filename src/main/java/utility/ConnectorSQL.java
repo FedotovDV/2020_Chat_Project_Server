@@ -1,43 +1,31 @@
 package utility;
 
 import java.sql.*;
+import java.util.*;
 
 public class ConnectorSQL {
-    private static Connection connectionSQL  = null;
-    private static String username = "root";
-    private static String password = "root";
-    private static String URL = "jdbc:MySQL://localhost:3306/chat_schema";
-//    private static String sqlInsertUser ="INSERT INTO users(name, E_mail, Password) values(%s, %s, %s);";
-
-    public static void main(String[] args) throws SQLException
-    {
-
-//        connectionSQL = DriverManager.getConnection(URL, username, password);
-        connectionSQL =DataSource.getConnection();
-
-        if(connectionSQL != null)
-            System.out.println("Connection Successful !\n");
-        else
-            System.exit(0);
-        try (Statement st = connectionSQL.createStatement()) {
 
 
-//            PreparedStatement resultSet = connectionSQL.prepareStatement(sqlInsertUser);
-//            final int i1 = resultSet.executeUpdate();
-            ResultSet rs;
-            rs = st.executeQuery("select * from users");
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next()) {
-                for (int i = 1; i <= columns; i++) {
-                    System.out.print(rs.getString(i) + "\t");
-                }
-                System.out.println();
-            }
-            System.out.println();
-            rs.close();
-//            st.close();
+    public static void main(String[] args) throws SQLException {
+
+        try (Connection c = DataSource.getConnection()){
+            Map<String, Object> map = JDBCUtils.select(c, "select * from users",
+                    new ResultSetHandler<Map<String, Object>>() {
+                        @Override
+                        public Map<String, Object> handle(ResultSet rs) throws SQLException {
+                            if (rs.next()) {
+                                Map<String, Object> map = new LinkedHashMap<>();
+                                for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+                                    map.put(rs.getMetaData().getColumnLabel(i), rs.getObject(i));
+                                }
+                                return map;
+                            } else
+                                return Collections.emptyMap();
+                        }
+                    });
+            System.out.println(map);
         }
-        if(connectionSQL != null)
-            connectionSQL.close();
+
     }
+
 }
