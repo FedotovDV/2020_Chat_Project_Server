@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import server.MyServer;
 import utility.DataSource;
 import utility.JDBCUtils;
+import utility.Message;
 
 import java.io.*;
 import java.net.Socket;
@@ -48,34 +49,49 @@ public class ClientEntity implements Runnable, Observer {
                 client = gson.fromJson(clientMessage, Client.class);
                 System.out.println("client = " + client);
                 try (Connection c = DataSource.getConnection()) {
-                    Client myClient = selectClientFromDB(c, client.getUserName());
+                    Client myClient = JDBCUtils.selectClientFromDB(c, client.getUserName());
+                    System.out.println("myClient = " + myClient);
                     if (myClient != null) {
                         if (myClient.getUserName().equals(client.getUserName())) {
                             if (myClient.getHashPass().equals(client.getHashPass())) {
                                 System.out.println(client + " есть в базе");
+                                client = myClient;
+                                server.addObserver(this);
+                                String jsonClient = gson.toJson(client);
+                                SendMessage(jsonClient);
+                                System.out.println("client = " + jsonClient);
                             } else {
                                 System.out.println(" неправильная пара логин - пароль! ");
+                                SendMessage(" неправильная пара логин - пароль! ");
                             }
                         }
                         }else {
                         System.out.println(" добавляем нового клиента ");
+
+                            int id = JDBCUtils.insertClientIntoDB(c, client.getUserName(), client.getHashPass());
+                            client.setUserId(id);
                         server.addObserver(this);
-                            int id = insertClientIntoDB(c, client.getUserName(), client.getHashPass());
-                        System.out.println("client = " + client);
-                            System.out.println(id);
+                        String jsonClient = gson.toJson(client);
+                        SendMessage(jsonClient);
+                        System.out.println("client = " + jsonClient);
                     }
 
                 }
-                server.notifyObservers(client.getUserName() + ": " + clientMessage);
+                server.notifyObservers("  "+ client.getUserName() + ": вошел в чат !");
             } else {
                 if (clientMessage.equalsIgnoreCase("Exit")) {
-                    this.SendMessage("Exit");
+                    SendMessage("Exit");
                     server.notifyObservers(client.getUserName() + " stop session!");
                     close();
                     System.out.println("Client " + client.getUserName() + ":  " + " stop session!");
                     break;
                 } else if (client != null) {
                     System.out.println("Client " + client.getUserName() + ":  " + clientMessage);
+                    Message message = new Message(clientMessage);
+                    try (Connection c = DataSource.getConnection()) {
+                        int idMessage = JDBCUtils.insertMessageIntoDB(c, clientMessage, client.getUserId(), -1);
+                        message.setIdMessage(idMessage);
+                    }
                     server.notifyObservers(client.getUserName() + ": " + clientMessage);
                 }
 

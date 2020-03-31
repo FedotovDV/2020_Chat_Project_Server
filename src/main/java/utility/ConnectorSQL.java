@@ -23,31 +23,48 @@ public class ConnectorSQL {
 ////    }
 //
         int idBD;
-        Client client;
+        int idMessage;
+//        Client client;
         try (Connection c = DataSource.getConnection()) {
+            idMessage = JDBCUtils.insert(c, "INSERT INTO message (Message_Text, idUser, idRecipient) values (?, ?,?);", new ResultSetHandler<Integer>() {
+                @Override
+                public Integer handle(ResultSet rs) throws SQLException {
+                    int inserted = -1;
+                    if (rs.next()) {
+                        inserted = rs.getInt(1);
+                    }
+                    return inserted;
+                }
+            }, "Hello world", 5, null);
+
+    }
+
+        System.out.println(idMessage);
+
+
 //           idBD = insertClientIntoDB(c);
-            client = selectClientFromDB(c);
-            System.out.println(client);
+//            client = selectClientFromDB(c);
+//            System.out.println(client);
         }
 //        System.out.println(idBD);
     }
 
     //
-    private static Client selectClientFromDB(Connection c) throws SQLException {
-        return JDBCUtils.select(c, "select * from users where NAME = ?; ",
-                new ResultSetHandler<Client>() {
-                    @Override
-                    public Client handle(ResultSet rs) throws SQLException {
-                        if (rs.next()) {
-                            Client client = new Client();
-                            client.setUserName(rs.getString(2));
-                            client.setHashPass(rs.getString(4));
-                            return client;
-                        } else
-                            return null;
-                    }
-                }, "user");
-    }
+//    private static Client selectClientFromDB(Connection c) throws SQLException {
+//        return JDBCUtils.select(c, "select * from users where NAME = ?; ",
+//                new ResultSetHandler<Client>() {
+//                    @Override
+//                    public Client handle(ResultSet rs) throws SQLException {
+//                        if (rs.next()) {
+//                            Client client = new Client();
+//                            client.setUserName(rs.getString(2));
+//                            client.setHashPass(rs.getString(4));
+//                            return client;
+//                        } else
+//                            return null;
+//                    }
+//                }, "user");
+//    }
 //
 //    private static Integer insertClientIntoDB(Connection c) throws SQLException {
 //        return JDBCUtils.insert(c, "INSERT INTO users (NAME,PASSWORD) values (?, ?);",new ResultSetHandler<Integer>(){
@@ -70,5 +87,5 @@ public class ConnectorSQL {
 ////                            System.out.println(myClient.getHashPass() == client.getHashPass());
 ////                        }
 ////
-}
+//}
 
