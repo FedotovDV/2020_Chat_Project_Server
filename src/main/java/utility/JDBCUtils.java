@@ -48,7 +48,22 @@ public class JDBCUtils {
                 }, name);
     }
 
-
+    public static Client selectClientFromDB(Connection c, int idUser) throws SQLException {
+        return select(c, "select * from users where idUser = ?; ",
+                new ResultSetHandler<Client>() {
+                    @Override
+                    public Client handle(ResultSet rs) throws SQLException {
+                        if (rs.next()) {
+                            Client client = new Client();
+                            client.setUserId(rs.getInt(1));
+                            client.setUserName(rs.getString(2));
+                            client.setHashPass(rs.getString(4));
+                            return client;
+                        } else
+                            return null;
+                    }
+                }, idUser);
+    }
 
     public static <T> T select(Connection c, String sql, ResultSetHandler<T> resultSetHandler, Object... parameters)
             throws SQLException {

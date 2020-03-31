@@ -12,7 +12,7 @@ import java.io.*;
 import java.net.Socket;
 import java.sql.Connection;
 
-import static utility.JDBCUtils.*;
+
 
 
 public class ClientEntity implements Runnable, Observer {
@@ -117,7 +117,7 @@ public class ClientEntity implements Runnable, Observer {
         writer.flush();
     }
 
-    public void close() {
+    private void close() {
         server.stopObserver(this);
         clients_count--;
         server.notifyObservers("members in chat = " + clients_count);

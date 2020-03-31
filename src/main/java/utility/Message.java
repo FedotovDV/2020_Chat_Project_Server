@@ -13,7 +13,7 @@ public class Message {
     private String messageText;
     private  int idUser;
     private  int idTopic;
-    private int idRecepient;
+    private int idRecipient;
 
     public Message (String messageText){
         this.messageText = messageText;
