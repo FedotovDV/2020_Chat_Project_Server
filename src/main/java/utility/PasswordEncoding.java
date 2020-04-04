@@ -1,5 +1,6 @@
 package utility;
 
+import interfaces.PasswordEncoder;
 import lombok.*;
 import java.security.MessageDigest;
 

@@ -1,4 +1,4 @@
-package utility;
+package interfaces;
 
 public interface PasswordEncoder {
     String hashPassword(char[] pass) throws Exception;
