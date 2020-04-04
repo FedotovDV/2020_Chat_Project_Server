@@ -10,6 +10,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.extern.log4j.Log4j;
+
+@Log4j
 public class MyServer  implements Observable {
 
     public final static int PORT = 8290;
@@ -20,6 +23,7 @@ public class MyServer  implements Observable {
         Socket socket = null;
 
         try (ServerSocket serverSocket = new ServerSocket(PORT)){
+            log.info("START SERVER");
             System.out.println("==START SERVER==");
             while (true) {
                 if (socket == null) {

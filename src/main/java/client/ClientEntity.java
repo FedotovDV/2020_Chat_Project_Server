@@ -1,20 +1,21 @@
 package client;
 
 import com.google.gson.Gson;
+import interfaces.ChatProvider;
 import interfaces.Observer;
 import lombok.SneakyThrows;
 import server.MyServer;
-import utility.DataSource;
-import utility.JDBCUtils;
-import utility.Message;
+import utility.*;
+
 
 import java.io.*;
 import java.net.Socket;
 import java.sql.Connection;
 
 
+import lombok.extern.log4j.Log4j;
 
-
+@Log4j
 public class ClientEntity implements Runnable, Observer {
 
     private Client client;
@@ -47,51 +48,48 @@ public class ClientEntity implements Runnable, Observer {
             if (clientMessage.startsWith("{")) {
                 Gson gson = new Gson();
                 client = gson.fromJson(clientMessage, Client.class);
-                System.out.println("client = " + client);
-                try (Connection c = DataSource.getConnection()) {
-                    Client myClient = JDBCUtils.selectClientFromDB(c, client.getUserName());
-                    System.out.println("myClient = " + myClient);
+                log.info("client = " + client);
+                    Client myClient = new DatabaseChatProvider().findByName(client);
+                    log.info("myClient = " + myClient);
                     if (myClient != null) {
                         if (myClient.getUserName().equals(client.getUserName())) {
                             if (myClient.getHashPass().equals(client.getHashPass())) {
-                                System.out.println(client + " есть в базе");
+                                log.info(client + " есть в базе");
                                 client = myClient;
                                 server.addObserver(this);
                                 String jsonClient = gson.toJson(client);
                                 SendMessage(jsonClient);
-                                System.out.println("client = " + jsonClient);
+                                log.info("jsonClient = " + jsonClient);
                             } else {
-                                System.out.println(" неправильная пара логин - пароль! ");
+                                log.info(" неправильная пара логин - пароль! ");
                                 SendMessage(" неправильная пара логин - пароль! ");
                             }
-                        }
-                        }else {
-                        System.out.println(" добавляем нового клиента ");
-
-                            int id = JDBCUtils.insertClientIntoDB(c, client.getUserName(), client.getHashPass());
-                            client.setUserId(id);
+                    } else {
+                        log.info(" добавляем нового клиента ");
+                        int id = new DatabaseChatProvider().createClient(client);
+                        client.setUserId(id);
                         server.addObserver(this);
                         String jsonClient = gson.toJson(client);
                         SendMessage(jsonClient);
-                        System.out.println("client = " + jsonClient);
+                        log.info("client = " + jsonClient);
                     }
 
                 }
-                server.notifyObservers("  "+ client.getUserName() + ": вошел в чат !");
+                log.info("send message to all client  " + client.getUserName() + ": вошел в чат !");
+                server.notifyObservers("  " + client.getUserName() + ": вошел в чат !");
             } else {
                 if (clientMessage.equalsIgnoreCase("Exit")) {
                     SendMessage("Exit");
                     server.notifyObservers(client.getUserName() + " stop session!");
                     close();
-                    System.out.println("Client " + client.getUserName() + ":  " + " stop session!");
+                    log.info("Client " + client.getUserName() + ":  " + " stop session!");
                     break;
                 } else if (client != null) {
-                    System.out.println("Client " + client.getUserName() + ":  " + clientMessage);
-                    Message message = new Message(clientMessage);
-                    try (Connection c = DataSource.getConnection()) {
-                        int idMessage = JDBCUtils.insertMessageIntoDB(c, clientMessage, client.getUserId(), -1);
-                        message.setIdMessage(idMessage);
-                    }
+                    log.info("Client send message " + client.getUserName() + ":  " + clientMessage);
+                    Message message = new Message(clientMessage, client);
+                    int idMessage = new DatabaseChatProvider().createMessage(message);
+                    message.setIdMessage(idMessage);
+                    log.info("the message is recorded in the database :" + message);
                     server.notifyObservers(client.getUserName() + ": " + clientMessage);
                 }
 

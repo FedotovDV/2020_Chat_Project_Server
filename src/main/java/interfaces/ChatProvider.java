@@ -4,15 +4,16 @@ import client.Client;
 import utility.Message;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 public interface ChatProvider {
 
-    long countAllClient();
+    long countAllClient() throws SQLException;
 
     List<Client> findAllCLient(int offset, int limit);
 
-    void createClient(Client client);
+    int createClient(Client client);
 
     void updateClient(Client client);
 
@@ -20,13 +21,13 @@ public interface ChatProvider {
 
     void deleteClientById(int id);
 
-    Client findByName( String name);
+    Client findByName(Client client);
 
-    Client findById( String name);
+    Client findById(Client client);
 
     List<Message> findAllMessage(int offset, int limit);
 
-    void createMessage(Message message);
+    int createMessage(Message message);
 
     void updateMessage(Message message);
 
