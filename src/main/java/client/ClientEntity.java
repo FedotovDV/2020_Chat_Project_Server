@@ -70,17 +70,17 @@ public class ClientEntity implements Runnable, Observer {
                             log.info(" неправильная пара логин - пароль! ");
                             SendMessage(TypeMessage.WRONGPASS.name());
                         }
-                    } else {
-                        log.info(" добавляем нового клиента ");
-                        int id = new DatabaseChatProvider().createClient(client);
-                        client.setUserId(id);
-                        server.addObserver(this);
-                        String sendJson = TypeMessage.LOGIN.name();
-                        jsonClient = gson.toJson(client);
-                        sendJson += jsonClient;
-                        SendMessage(sendJson);
-                        log.info("client = " + jsonClient);
                     }
+                } else {
+                    log.info(" добавляем нового клиента ");
+                    int id = new DatabaseChatProvider().createClient(client);
+                    client.setUserId(id);
+                    server.addObserver(this);
+                    String sendJson = TypeMessage.LOGIN.name();
+                    jsonClient = gson.toJson(client);
+                    sendJson += jsonClient;
+                    SendMessage(sendJson);
+                    log.info("client = " + jsonClient);
                 }
                 log.info("send message to all client  " + client.getUserName() + ": вошел в чат !");
                 server.notifyObservers(TypeMessage.MESSAGE.name()+"  " + client.getUserName() + ": вошел в чат !");

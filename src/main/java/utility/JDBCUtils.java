@@ -1,6 +1,6 @@
 package utility;
 
-import client.Client;
+import interfaces.ResultSetHandler;
 
 import java.sql.*;
 

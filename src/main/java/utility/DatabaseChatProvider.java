@@ -1,7 +1,7 @@
 package utility;
 
 import client.Client;
-import utility.JDBCUtils;
+import interfaces.ResultSetHandler;
 import interfaces.ChatProvider;
 
 import java.sql.Connection;
